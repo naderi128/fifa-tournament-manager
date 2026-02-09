@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row justify-between items-end gap-4">
+    <div>
+        <h2 class="text-4xl font-black mb-2">League Standings</h2>
+        <div class="w-full bg-slate-800 rounded-full h-2 mb-2 max-w-sm">
+            <div class="bg-blue-500 h-2 rounded-full transition-all duration-1000" style="width: {{ progress }}%"></div>
+        </div>
+        <p class="text-sm text-gray-500">Tournament Progress: {{ progress }}%</p>
+    </div>
+
+    <div class="flex gap-2">
+        <a href="{{ url_for('export_txt') }}"
+            class="glass px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">Export TXT</a>
+        <a href="{{ url_for('export_json') }}" target="_blank"
+            class="glass px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">JSON API</a>
+    </div>
+</div>
+
+<div class="glass rounded-3xl overflow-hidden mb-12 shadow-2xl">
+    <table class="w-full text-left">
+        <thead>
+            <tr class="bg-slate-800/50 text-gray-400 text-xs uppercase tracking-widest">
+                <th class="px-6 py-4">Pos</th>
+                <th class="px-6 py-4">Team</th>
+                <th class="px-6 py-4">Owner</th>
+                <th class="px-6 py-4 text-center">GP</th>
+                <th class="px-6 py-4 text-center">W</th>
+                <th class="px-6 py-4 text-center">D</th>
+                <th class="px-6 py-4 text-center">L</th>
+                <th class="px-6 py-4 text-center">GF</th>
+                <th class="px-6 py-4 text-center border-l border-slate-700">GD</th>
+                <th class="px-6 py-4 text-center bg-blue-500/10 text-blue-400">Pts</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800">
+            {% for team in standings %}
+            <tr class="hover:bg-slate-800/30 transition">
+                <td class="px-6 py-4 font-bold text-gray-500">{{ loop.index }}</td>
+                <td class="px-6 py-4 font-bold">{{ team.name }}</td>
+                <td class="px-6 py-4 text-sm text-gray-400">{{ team.owner }}</td>
+                <td class="px-6 py-4 text-center">{{ team.GP }}</td>
+                <td class="px-6 py-4 text-center">{{ team.W }}</td>
+                <td class="px-6 py-4 text-center">{{ team.D }}</td>
+                <td class="px-6 py-4 text-center">{{ team.L }}</td>
+                <td class="px-6 py-4 text-center">{{ team.GF }}</td>
+                <td class="px-6 py-4 text-center border-l border-slate-800 text-gray-400">{{ team.GD }}</td>
+                <td class="px-6 py-4 text-center font-black bg-blue-500/5 text-blue-400 text-lg">{{ team.Pts }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if not standings %}
+    <div class="p-12 text-center text-gray-500">
+        Setup your teams to see the league table.
+    </div>
+    {% endif %}
+</div>
+
+<div class="grid md:grid-cols-2 gap-8">
+    <!-- Top Scorers -->
+    <div class="glass p-8 rounded-2xl">
+        <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+            <span class="text-2xl">👟</span> Golden Boot
+        </h3>
+        <div class="space-y-4">
+            {% for scorer, goals in top_scorers %}
+            <div class="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg">
+                <span class="font-semibold">{{ scorer }}</span>
+                <span class="bg-blue-600 px-3 py-1 rounded-full text-xs font-bold">{{ goals }} Goals</span>
+            </div>
+            {% else %}
+            <p class="text-gray-500 italic text-sm">No goals recorded yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Vercel Persistence Helper -->
+    <div class="glass p-8 rounded-2xl border-yellow-500/20">
+        <h3 class="text-xl font-bold mb-4 text-yellow-500 flex items-center gap-2">
+            <span>🛡️</span> Vercel Persistence
+        </h3>
+        <p class="text-sm text-gray-400 mb-6">
+            Since this is running on Vercel, data will reset if the app is inactive. Use this to save your tournament
+            progress to your computer and reload it later.
+        </p>
+        <div class="space-y-4">
+            <a href="{{ url_for('export_json') }}" download="tournament_state.json"
+                class="block text-center border border-slate-700 hover:bg-slate-700 py-2 rounded-lg text-sm transition transition">
+                备份 State (Download JSON)
+            </a>
+            <form action="{{ url_for('import_state') }}" method="POST" enctype="multipart/form-data">
+                <label class="block text-xs text-gray-500 mb-1">Restore State (Upload JSON)</label>
+                <div class="flex gap-2">
+                    <input type="file" name="file" accept=".json"
+                        class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-slate-700 file:text-blue-400 hover:file:bg-slate-600">
+                    <button type="submit" class="bg-blue-600 px-3 py-1 rounded text-xs">Load</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

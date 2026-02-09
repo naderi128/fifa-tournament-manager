@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+tournament_data.json
+.vercel/
+.env
+venv/
+env/
+.vscode/
+*.txt
+!README.md

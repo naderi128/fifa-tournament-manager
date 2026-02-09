@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="grid md:grid-cols-2 gap-8">
+    <!-- Step 1: Players -->
+    <div class="glass p-8 rounded-2xl">
+        <h2 class="text-xl font-bold mb-6 text-blue-400">Step 1: Registered Players</h2>
+        <form action="{{ url_for('setup') }}" method="POST" class="mb-6 flex gap-2">
+            <input type="hidden" name="action" value="add_player">
+            <input type="text" name="player_name" placeholder="Friend's Name" required
+                class="bg-slate-800 border-slate-700 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-blue-500 outline-none">
+            <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold">Add</button>
+        </form>
+
+        <div class="flex flex-wrap gap-2">
+            {% for player in tournament.players %}
+            <span class="bg-slate-700 px-3 py-1 rounded-full text-sm">{{ player }}</span>
+            {% else %}
+            <p class="text-gray-500 italic text-sm">No players added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Step 2: Teams -->
+    <div class="glass p-8 rounded-2xl">
+        <h2 class="text-xl font-bold mb-6 text-purple-400">Step 2: Assign Teams</h2>
+        {% if not tournament.players %}
+        <p class="text-gray-500 italic text-sm">Add players first to assign teams.</p>
+        {% else %}
+        <form action="{{ url_for('setup') }}" method="POST" class="space-y-4">
+            <input type="hidden" name="action" value="add_team">
+            <select name="owner_name" required
+                class="bg-slate-800 border-slate-700 rounded-lg px-4 py-2 w-full outline-none">
+                {% for player in tournament.players %}
+                <option value="{{ player }}">{{ player }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="team_name" placeholder="e.g. Real Madrid, PSG..." required
+                class="bg-slate-800 border-slate-700 rounded-lg px-4 py-2 w-full outline-none">
+            <button type="submit"
+                class="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-lg w-full font-semibold transition">Add
+                Team</button>
+        </form>
+
+        <div class="mt-6 space-y-2">
+            {% for team in tournament.teams %}
+            <div class="flex justify-between items-center text-sm bg-slate-800/50 p-2 rounded">
+                <span>{{ team.name }}</span>
+                <span class="text-gray-400 text-xs">Owner: {{ team.owner_name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Step 3: Generate -->
+<div class="mt-8 glass p-8 rounded-2xl text-center">
+    <h2 class="text-xl font-bold mb-4">Step 3: Ready to Kickoff?</h2>
+    <p class="text-gray-400 mb-6 max-w-lg mx-auto">This will generate a Double Round Robin schedule. Ensure all teams
+        are added. Teams owned by the same player will NOT play each other.</p>
+
+    <form action="{{ url_for('setup') }}" method="POST">
+        <input type="hidden" name="action" value="generate">
+        <button type="submit" class="btn-primary px-12 py-4 rounded-xl text-lg font-bold" {% if tournament.teams|length
+            < 2 %}disabled{% endif %}>
+            🚀 Generate Schedule
+        </button>
+    </form>
+</div>
+{% endblock %}
