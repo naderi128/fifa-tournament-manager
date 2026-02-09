@@ -61,27 +61,28 @@
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-6 py-12">
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
 
         <!-- SETUP VIEW -->
-        <section id="view-setup" class="view space-y-12">
-            <div class="grid lg:grid-cols-2 gap-12">
+        <section id="view-setup" class="view space-y-8 sm:space-y-12">
+            <div class="grid lg:grid-cols-2 gap-6 sm:gap-12">
                 <!-- Players -->
-                <div class="glass p-8 rounded-3xl">
-                    <h2 class="text-xl font-bold mb-6 text-blue-400 flex items-center gap-2">
+                <div class="glass p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
+                    <h2 class="text-lg sm:text-xl font-bold mb-6 text-blue-400 flex items-center gap-2">
                         <span>👥</span> Step 1: Add Players
                     </h2>
-                    <div class="flex gap-2 mb-6">
-                        <input type="text" id="player-name" placeholder="Friend's Name"
+                    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                        <input type="text" id="player-name" placeholder="Name (e.g. Ali)"
                             class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-blue-500 transition">
-                        <button onclick="addPlayer()" class="btn-active px-6 py-3 rounded-xl font-bold">Add</button>
+                        <button onclick="addPlayer()"
+                            class="btn-active px-6 py-3 rounded-xl font-bold whitespace-nowrap">Add Player</button>
                     </div>
                     <div id="player-list" class="flex flex-wrap gap-2"></div>
                 </div>
 
                 <!-- Teams -->
-                <div class="glass p-8 rounded-3xl">
-                    <h2 class="text-xl font-bold mb-6 text-indigo-400 flex items-center gap-2">
+                <div class="glass p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
+                    <h2 class="text-lg sm:text-xl font-bold mb-6 text-indigo-400 flex items-center gap-2">
                         <span>🏟️</span> Step 2: Assign Teams
                     </h2>
 
@@ -92,18 +93,18 @@
                         </div>
 
                         <div id="team-input-area" class="hidden">
-                            <div class="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-2xl mb-4">
-                                <p class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Adding for:
-                                </p>
-                                <p id="active-player-name" class="text-xl font-black text-white"></p>
+                            <div class="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl mb-4">
+                                <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1">Adding
+                                    for:</p>
+                                <p id="active-player-name" class="text-lg font-black text-white"></p>
                             </div>
 
-                            <div class="flex gap-2">
-                                <input type="text" id="team-name" placeholder="Type team name (e.g. Liverpool)"
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="team-name" placeholder="Team (e.g. Real Madrid)"
                                     list="team-suggestions"
-                                    class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-4 w-full outline-none focus:border-indigo-500 transition text-lg">
+                                    class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-indigo-500 transition">
                                 <button onclick="addTeam()"
-                                    class="bg-indigo-600 hover:bg-indigo-500 px-8 py-4 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                                    class="bg-indigo-600 hover:bg-indigo-500 px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/20">
                                     <span>Add</span>
                                 </button>
                             </div>
@@ -139,31 +140,32 @@
             </div>
 
             <!-- Generate -->
-            <div class="glass p-12 rounded-[2rem] text-center border-blue-500/20 shadow-2xl shadow-blue-500/5">
-                <h2 class="text-2xl font-bold mb-4">Step 3: Ready for Kickoff?</h2>
-                <p class="text-gray-400 mb-8 max-w-xl mx-auto">This generates a <b>Double Round Robin</b> (Home & Away)
-                    schedule. Teams owned by the same player will never play each other.</p>
+            <div
+                class="glass p-8 sm:p-12 rounded-3xl sm:rounded-[2rem] text-center border-blue-500/20 shadow-2xl shadow-blue-500/5">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 3: Ready for Kickoff?</h2>
+                <p class="text-sm text-gray-400 mb-8 max-w-xl mx-auto">This generates a Double Round Robin schedule.
+                    Teams owned by the same player will never play each other.</p>
                 <button onclick="generateSchedule()"
-                    class="btn-active px-16 py-5 rounded-2xl text-xl font-black uppercase tracking-tighter">
+                    class="btn-active w-full sm:w-auto px-12 py-4 sm:py-5 rounded-2xl text-lg sm:text-xl font-black uppercase tracking-tighter">
                     🚀 Start Tournament
                 </button>
             </div>
         </section>
 
         <!-- MATCHES VIEW -->
-        <section id="view-matches" class="view hidden space-y-12">
+        <section id="view-matches" class="view hidden space-y-8 sm:space-y-12">
             <div id="next-match-container"></div>
 
-            <div class="grid lg:grid-cols-2 gap-12">
+            <div class="grid lg:grid-cols-2 gap-8 sm:gap-12">
                 <div>
-                    <h3 class="text-xl font-bold mb-6 text-blue-400 flex items-center gap-2">
-                        <span>📅</span> Upcoming Fixtures
+                    <h3 class="text-lg sm:text-xl font-bold mb-6 text-blue-400 flex items-center gap-2">
+                        <span>📅</span> Upcoming
                     </h3>
                     <div id="upcoming-list" class="space-y-3"></div>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold mb-6 text-gray-400 flex items-center gap-2">
-                        <span>⌛</span> Recent Results
+                    <h3 class="text-lg sm:text-xl font-bold mb-6 text-slate-500 flex items-center gap-2">
+                        <span>⌛</span> Results
                     </h3>
                     <div id="history-list" class="space-y-3"></div>
                 </div>
@@ -171,52 +173,41 @@
         </section>
 
         <!-- STANDINGS VIEW -->
-        <section id="view-standings" class="view hidden space-y-12">
-            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+        <section id="view-standings" class="view hidden space-y-8 sm:space-y-12">
+            <div class="flex flex-col gap-6">
                 <div>
-                    <h2 class="text-4xl font-black mb-4 tracking-tighter">The League Table</h2>
-                    <div class="w-80 h-2 bg-slate-900 rounded-full overflow-hidden">
+                    <h2 class="text-3xl sm:text-4xl font-black mb-4 tracking-tighter text-center sm:text-left">League
+                        Table</h2>
+                    <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
                         <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-700" style="width: 0%">
                         </div>
                     </div>
-                    <div id="progress-text" class="text-xs text-gray-500 mt-2 uppercase font-bold">Progress: 0%</div>
+                    <div id="progress-text" class="text-[10px] text-gray-500 mt-2 uppercase font-bold">Progress: 0%
+                    </div>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex flex-wrap gap-2">
                     <button onclick="exportJSON()"
-                        class="glass px-5 py-2 rounded-xl text-sm font-semibold hover:bg-slate-800 transition">Backup
-                        Data</button>
+                        class="glass flex-1 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition">Backup</button>
                     <label
-                        class="glass px-5 py-2 rounded-xl text-sm font-semibold hover:bg-slate-800 transition cursor-pointer">
+                        class="glass flex-1 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition cursor-pointer text-center">
                         Restore
                         <input type="file" onchange="importJSON(event)" class="hidden">
                     </label>
                 </div>
             </div>
 
-            <div class="glass rounded-[2rem] overflow-hidden shadow-2xl">
-                <table class="w-full text-left">
+            <div class="glass rounded-2xl sm:rounded-[2rem] overflow-x-auto shadow-2xl">
+                <table class="min-w-full text-left">
                     <thead>
-                        <tr class="bg-slate-900/50 text-gray-500 text-[10px] uppercase font-black tracking-widest">
-                            <th class="px-8 py-5">Pos</th>
-                            <th class="px-8 py-5">Team</th>
-                            <th class="px-8 py-5">Player</th>
-                            <th class="px-8 py-5 text-center">GP</th>
-                            <th class="px-8 py-5 text-center">W</th>
-                            <th class="px-8 py-5 text-center">D</th>
-                            <th class="px-8 py-5 text-center">L</th>
-                            <th class="px-8 py-5 text-center border-l border-slate-800 text-blue-400">Pts</th>
+                        <tr class="bg-slate-900/50 text-gray-500 text-[9px] uppercase font-black tracking-widest">
+                            <th class="px-4 sm:px-8 py-5 text-center">Pos</th>
+                            <th class="px-4 sm:px-8 py-5">Team</th>
+                            <th class="px-2 py-5 text-center">GP</th>
+                            <th class="px-2 py-5 text-center border-l border-slate-800 text-blue-400">Pts</th>
                         </tr>
                     </thead>
                     <tbody id="standings-body" class="divide-y divide-slate-800/50"></tbody>
                 </table>
-            </div>
-
-            <!-- Golden Boot -->
-            <div class="max-w-md glass p-8 rounded-3xl">
-                <h3 class="text-xl font-bold mb-6 flex items-center gap-2 text-yellow-500">
-                    <span>👟</span> Top Scorers
-                </h3>
-                <div id="scorers-list" class="space-y-3"></div>
             </div>
         </section>
 
@@ -228,7 +219,6 @@
             players: [],
             teams: [],
             matches: [],
-            scorers: {},
             activePlayer: null
         };
 
@@ -366,11 +356,9 @@
         function submitScore(matchId) {
             const h = parseInt(document.getElementById('score-h').value);
             const a = parseInt(document.getElementById('score-a').value);
-            const scrsInput = document.getElementById('scorers-input');
-            const scrs = scrsInput.value.split(',').map(s => s.trim()).filter(s => s);
 
             if (isNaN(h) || isNaN(a)) {
-                alert("Please enter both scores!");
+                alert("Enter score!");
                 return;
             }
 
@@ -378,13 +366,7 @@
             if (match) {
                 match.hScore = h;
                 match.aScore = a;
-                match.scorers = scrs;
                 match.completed = true;
-
-                // Track scorers
-                scrs.forEach(s => {
-                    tournament.scorers[s] = (tournament.scorers[s] || 0) + 1;
-                });
 
                 save();
                 renderAll();
@@ -395,27 +377,27 @@
         function renderAll() {
             // Step 1 List
             document.getElementById('player-list').innerHTML = tournament.players.map(p =>
-                `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-bold">${p}</span>`
+                `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-[10px] font-bold">${p}</span>`
             ).join('');
 
             // Step 2 Player Selectors
             document.getElementById('player-selector-container').innerHTML = tournament.players.map(p => `
                 <button onclick="selectPlayerForTeam('${p}')" 
-                        class="p-4 rounded-2xl border-2 transition-all duration-200 text-left ${tournament.activePlayer === p ? 'border-indigo-500 bg-indigo-500/20' : 'border-slate-800 bg-slate-900/50 hover:border-slate-700'}">
-                    <p class="text-[10px] text-gray-500 font-black uppercase mb-1">Player</p>
-                    <p class="font-bold truncate">${p}</p>
-                    <p class="text-[10px] text-indigo-400 mt-2 font-bold">${tournament.teams.filter(t => t.owner === p).length} Teams</p>
+                        class="p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 text-left ${tournament.activePlayer === p ? 'border-indigo-500 bg-indigo-500/20' : 'border-slate-800 bg-slate-900/50 hover:border-slate-700'}">
+                    <p class="text-[8px] text-gray-500 font-black uppercase mb-1">Player</p>
+                    <p class="text-xs sm:text-sm font-bold truncate">${p}</p>
+                    <p class="text-[8px] text-indigo-400 mt-1 font-bold">${tournament.teams.filter(t => t.owner === p).length} Teams</p>
                 </button>
             `).join('');
 
             // Step 2 Team List
             document.getElementById('team-list').innerHTML = tournament.teams.map(t => `
-                <div class="group relative glass p-4 rounded-2xl flex justify-between items-center text-sm">
-                    <div>
-                        <p class="font-black text-white">${t.name}</p>
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">${t.owner}</p>
+                <div class="group relative bg-slate-900/80 p-3 rounded-xl flex justify-between items-center text-xs border border-slate-800">
+                    <div class="truncate pr-2">
+                        <p class="font-black text-white truncate">${t.name}</p>
+                        <p class="text-[8px] text-gray-500 font-bold uppercase truncate">${t.owner}</p>
                     </div>
-                    <button onclick="deleteTeam('${t.id}')" class="text-red-500/0 group-hover:text-red-500/60 hover:!text-red-500 transition-all">
+                    <button onclick="deleteTeam('${t.id}')" class="text-red-500/40 hover:text-red-500 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                 </div>
@@ -428,49 +410,48 @@
             if (pending.length > 0) {
                 const next = pending[0];
                 document.getElementById('next-match-container').innerHTML = `
-                    <div class="glass p-12 rounded-[2.5rem] border-blue-500/30">
-                        <div class="text-center text-xs font-black tracking-widest text-blue-500 uppercase mb-8">Next Match</div>
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-12">
-                            <div class="text-center flex-1">
-                                <div class="text-4xl font-extrabold mb-2">${next.home.name}</div>
-                                <div class="text-gray-500 text-sm font-bold uppercase tracking-widest">${next.home.owner}</div>
-                                <input id="score-h" type="number" min="0" placeholder="0" class="mt-8 bg-slate-900 border-2 border-slate-700 w-24 h-24 text-center text-5xl font-black rounded-3xl focus:border-blue-500 outline-none">
+                    <div class="glass p-6 sm:p-12 rounded-2xl sm:rounded-[2.5rem] border-blue-500/30">
+                        <div class="text-center text-[10px] font-black tracking-widest text-blue-500 uppercase mb-6 sm:mb-8">Next Match</div>
+                        <div class="flex items-center justify-between gap-2 sm:gap-12">
+                            <div class="text-center flex-1 min-w-0">
+                                <div class="text-lg sm:text-4xl font-extrabold mb-1 truncate leading-tight">${next.home.name}</div>
+                                <div class="text-[10px] sm:text-sm text-gray-500 font-bold uppercase tracking-widest truncate">${next.home.owner}</div>
+                                <input id="score-h" type="number" min="0" inputmode="numeric" placeholder="0" class="mt-4 sm:mt-8 bg-slate-900 border-2 border-slate-700 w-16 h-16 sm:w-24 sm:h-24 text-center text-2xl sm:text-5xl font-black rounded-xl sm:rounded-3xl focus:border-blue-500 outline-none">
                             </div>
-                            <div class="text-4xl text-slate-700 font-bold">VS</div>
-                            <div class="text-center flex-1">
-                                <div class="text-4xl font-extrabold mb-2">${next.away.name}</div>
-                                <div class="text-gray-500 text-sm font-bold uppercase tracking-widest">${next.away.owner}</div>
-                                <input id="score-a" type="number" min="0" placeholder="0" class="mt-8 bg-slate-900 border-2 border-slate-700 w-24 h-24 text-center text-5xl font-black rounded-3xl focus:border-blue-500 outline-none">
+                            <div class="text-xl sm:text-4xl text-slate-700 font-bold">-</div>
+                            <div class="text-center flex-1 min-w-0">
+                                <div class="text-lg sm:text-4xl font-extrabold mb-1 truncate leading-tight">${next.away.name}</div>
+                                <div class="text-[10px] sm:text-sm text-gray-500 font-bold uppercase tracking-widest truncate">${next.away.owner}</div>
+                                <input id="score-a" type="number" min="0" inputmode="numeric" placeholder="0" class="mt-4 sm:mt-8 bg-slate-900 border-2 border-slate-700 w-16 h-16 sm:w-24 sm:h-24 text-center text-2xl sm:text-5xl font-black rounded-xl sm:rounded-3xl focus:border-blue-500 outline-none">
                             </div>
                         </div>
-                        <div class="mt-12 max-w-md mx-auto space-y-4 text-center">
-                            <input id="scorers-input" type="text" placeholder="Goal Scorers (comma separated)" class="w-full bg-slate-900 p-4 border border-slate-700 rounded-2xl outline-none focus:border-blue-500">
-                            <button onclick="submitScore('${next.id}')" class="btn-active w-full py-5 rounded-3xl font-black text-xl tracking-tighter uppercase">Submit Result</button>
+                        <div class="mt-8 max-w-xs mx-auto text-center">
+                            <button onclick="submitScore('${next.id}')" class="btn-active w-full py-4 rounded-xl sm:rounded-3xl font-black text-lg tracking-tighter uppercase">Submit</button>
                         </div>
                     </div>
                 `;
             } else if (tournament.matches.length > 0) {
                 document.getElementById('next-match-container').innerHTML = `
-                    <div class="glass p-16 rounded-[2.5rem] text-center">
-                        <div class="text-6xl mb-6">🏆</div>
-                        <h2 class="text-4xl font-black tracking-tighter">FINALE COMPLETO!</h2>
-                        <p class="text-gray-500 mt-2 font-bold uppercase tracking-widest text-xs">League History Recorded</p>
+                    <div class="glass p-12 rounded-[2rem] text-center">
+                        <div class="text-5xl mb-6">🏆</div>
+                        <h2 class="text-3xl font-black tracking-tighter italic">FINALE COMPLETO!</h2>
+                        <p class="text-gray-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Legend Stays Forever</p>
                     </div>
                 `;
             }
 
             document.getElementById('upcoming-list').innerHTML = pending.slice(1, 11).map(m => `
-                <div class="bg-slate-900/40 p-4 rounded-2xl flex justify-between items-center text-[10px] border border-slate-800/50">
-                    <div class="flex-1 text-right font-black uppercase text-gray-300 truncate">${m.home.name}</div>
-                    <div class="px-4 text-slate-800 font-black italic">VS</div>
-                    <div class="flex-1 font-black uppercase text-gray-300 truncate">${m.away.name}</div>
+                <div class="bg-slate-900/40 p-3 rounded-xl flex justify-between items-center text-[10px] border border-slate-800/50">
+                    <div class="flex-1 text-right font-black uppercase text-gray-400 truncate">${m.home.name}</div>
+                    <div class="px-3 text-slate-800 font-bold">VS</div>
+                    <div class="flex-1 font-black uppercase text-gray-400 truncate">${m.away.name}</div>
                 </div>
             `).join('');
 
             document.getElementById('history-list').innerHTML = history.slice(0, 10).map(m => `
-                <div class="glass p-4 rounded-2xl flex justify-between items-center text-xs">
+                <div class="bg-slate-900/30 p-3 rounded-xl flex justify-between items-center text-[10px]">
                     <div class="flex-1 text-right font-bold truncate">${m.home.name}</div>
-                    <div class="px-6 text-blue-400 font-black text-lg tracking-tighter">${m.hScore} - ${m.aScore}</div>
+                    <div class="px-4 text-blue-400 font-black text-sm tracking-tighter">${m.hScore} - ${m.aScore}</div>
                     <div class="flex-1 font-bold truncate">${m.away.name}</div>
                 </div>
             `).join('');
@@ -500,14 +481,15 @@
 
             document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
                 <tr class="hover:bg-blue-500/5 transition group">
-                    <td class="px-8 py-6 font-black text-gray-600">${i + 1}</td>
-                    <td class="px-8 py-6 font-extrabold text-blue-50">${t.name}</td>
-                    <td class="px-8 py-6 text-xs text-gray-500 font-bold uppercase">${t.owner}</td>
-                    <td class="px-8 py-6 text-center text-sm">${t.gp}</td>
-                    <td class="px-8 py-6 text-center text-sm font-bold text-green-400/80">${t.w}</td>
-                    <td class="px-8 py-6 text-center text-sm font-bold text-gray-500">${t.d}</td>
-                    <td class="px-8 py-6 text-center text-sm font-bold text-red-400/80">${t.l}</td>
-                    <td class="px-8 py-6 text-center text-xl font-black bg-blue-500/5 text-blue-400 border-l border-slate-800">${t.pts}</td>
+                    <td class="px-4 sm:px-8 py-5 text-center font-black text-gray-600 text-[10px]">${i + 1}</td>
+                    <td class="px-4 sm:px-8 py-5">
+                        <div class="flex flex-col">
+                            <span class="font-extrabold text-blue-50 text-xs sm:text-sm truncate">${t.name}</span>
+                            <span class="text-[8px] text-gray-600 font-black uppercase">${t.owner}</span>
+                        </div>
+                    </td>
+                    <td class="px-2 py-5 text-center text-[10px] font-bold">${t.gp}</td>
+                    <td class="px-2 py-5 text-center text-lg font-black bg-blue-500/5 text-blue-400 border-l border-slate-800">${t.pts}</td>
                 </tr>
             `).join('');
 
@@ -515,21 +497,12 @@
             const prog = tournament.matches.length > 0 ? (comp / tournament.matches.length * 100) : 0;
             document.getElementById('progress-bar').style.width = prog + '%';
             document.getElementById('progress-text').innerText = 'Progress: ' + Math.floor(prog) + '%';
-
-            // Top Scorers
-            const scorers = Object.entries(tournament.scorers).sort((a, b) => b[1] - a[1]);
-            document.getElementById('scorers-list').innerHTML = scorers.map(([name, goals]) => `
-                <div class="flex justify-between items-center bg-slate-900/80 p-3 rounded-2xl text-sm border border-slate-800">
-                    <span class="font-bold">${name}</span>
-                    <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">${goals} Goals</span>
-                </div>
-            `).join('');
         }
 
         // --- RESET & EXPORT ---
         function resetTournament() {
             if (confirm("THIS DELETES ALL DATA. ARE YOU SURE?")) {
-                tournament = { players: [], teams: [], matches: [], scorers: {} };
+                tournament = { players: [], teams: [], matches: [] };
                 save();
                 window.location.reload();
             }
