@@ -5,14 +5,11 @@ import json
 import datetime
 import io
 
-# Add parent directory to path to import models and logic
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+import persistence
 from models import Tournament
 from scheduler import generate_double_round_robin_schedule
-import persistence
 
-app = Flask(__name__, template_folder='../templates')
+app = Flask(__name__, template_folder='templates')
 app.secret_key = 'fifa_league_secret_key'
 
 def get_tournament():
