@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA Tournament Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.2s;
+        }
+
+        .btn-active:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-item {
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-item.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen selection:bg-blue-500/30">
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1
+                class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 tracking-tighter">
+                🎮 FIFA LEAGUE MANAGER
+            </h1>
+            <div class="flex gap-6 text-sm font-semibold uppercase tracking-widest text-gray-400">
+                <button onclick="switchView('setup')" id="nav-setup" class="nav-item">Setup</button>
+                <button onclick="switchView('matches')" id="nav-matches" class="nav-item">Matches</button>
+                <button onclick="switchView('standings')" id="nav-standings" class="nav-item">Standings</button>
+            </div>
+            <button onclick="resetTournament()"
+                class="text-xs text-red-500/60 hover:text-red-500 transition border border-red-500/20 px-3 py-1 rounded-full">Reset</button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+
+        <!-- SETUP VIEW -->
+        <section id="view-setup" class="view space-y-12">
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Players -->
+                <div class="glass p-8 rounded-3xl">
+                    <h2 class="text-xl font-bold mb-6 text-blue-400 flex items-center gap-2">
+                        <span>👥</span> Step 1: Add Players
+                    </h2>
+                    <div class="flex gap-2 mb-6">
+                        <input type="text" id="player-name" placeholder="Friend's Name"
+                            class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-blue-500 transition">
+                        <button onclick="addPlayer()" class="btn-active px-6 py-3 rounded-xl font-bold">Add</button>
+                    </div>
+                    <div id="player-list" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Teams -->
+                <div class="glass p-8 rounded-3xl">
+                    <h2 class="text-xl font-bold mb-6 text-indigo-400 flex items-center gap-2">
+                        <span>🏟️</span> Step 2: Assign Teams
+                    </h2>
+                    <div class="space-y-4">
+                        <select id="team-owner"
+                            class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-indigo-500 transition"></select>
+                        <div class="flex gap-2">
+                            <input type="text" id="team-name" placeholder="e.g. Real Madrid"
+                                class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-indigo-500 transition">
+                            <button onclick="addTeam()"
+                                class="bg-indigo-600 hover:bg-indigo-500 px-6 py-3 rounded-xl font-bold transition">Assign</button>
+                        </div>
+                    </div>
+                    <div id="team-list" class="mt-8 space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Generate -->
+            <div class="glass p-12 rounded-[2rem] text-center border-blue-500/20 shadow-2xl shadow-blue-500/5">
+                <h2 class="text-2xl font-bold mb-4">Step 3: Ready for Kickoff?</h2>
+                <p class="text-gray-400 mb-8 max-w-xl mx-auto">This generates a <b>Double Round Robin</b> (Home & Away)
+                    schedule. Teams owned by the same player will never play each other.</p>
+                <button onclick="generateSchedule()"
+                    class="btn-active px-16 py-5 rounded-2xl text-xl font-black uppercase tracking-tighter">
+                    🚀 Start Tournament
+                </button>
+            </div>
+        </section>
+
+        <!-- MATCHES VIEW -->
+        <section id="view-matches" class="view hidden space-y-12">
+            <div id="next-match-container"></div>
+
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-xl font-bold mb-6 text-blue-400 flex items-center gap-2">
+                        <span>📅</span> Upcoming Fixtures
+                    </h3>
+                    <div id="upcoming-list" class="space-y-3"></div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6 text-gray-400 flex items-center gap-2">
+                        <span>⌛</span> Recent Results
+                    </h3>
+                    <div id="history-list" class="space-y-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STANDINGS VIEW -->
+        <section id="view-standings" class="view hidden space-y-12">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+                <div>
+                    <h2 class="text-4xl font-black mb-4 tracking-tighter">The League Table</h2>
+                    <div class="w-80 h-2 bg-slate-900 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-700" style="width: 0%">
+                        </div>
+                    </div>
+                    <div id="progress-text" class="text-xs text-gray-500 mt-2 uppercase font-bold">Progress: 0%</div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="exportJSON()"
+                        class="glass px-5 py-2 rounded-xl text-sm font-semibold hover:bg-slate-800 transition">Backup
+                        Data</button>
+                    <label
+                        class="glass px-5 py-2 rounded-xl text-sm font-semibold hover:bg-slate-800 transition cursor-pointer">
+                        Restore
+                        <input type="file" onchange="importJSON(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div class="glass rounded-[2rem] overflow-hidden shadow-2xl">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-900/50 text-gray-500 text-[10px] uppercase font-black tracking-widest">
+                            <th class="px-8 py-5">Pos</th>
+                            <th class="px-8 py-5">Team</th>
+                            <th class="px-8 py-5">Player</th>
+                            <th class="px-8 py-5 text-center">GP</th>
+                            <th class="px-8 py-5 text-center">W</th>
+                            <th class="px-8 py-5 text-center">D</th>
+                            <th class="px-8 py-5 text-center">L</th>
+                            <th class="px-8 py-5 text-center border-l border-slate-800 text-blue-400">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standings-body" class="divide-y divide-slate-800/50"></tbody>
+                </table>
+            </div>
+
+            <!-- Golden Boot -->
+            <div class="max-w-md glass p-8 rounded-3xl">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2 text-yellow-500">
+                    <span>👟</span> Top Scorers
+                </h3>
+                <div id="scorers-list" class="space-y-3"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- DATA MODEL ---
+        let tournament = {
+            players: [],
+            teams: [],
+            matches: [],
+            scorers: {}
+        };
+
+        // --- CORE FUNCTIONS ---
+        function save() {
+            localStorage.setItem('fifa_tournament_v2', JSON.stringify(tournament));
+        }
+
+        function load() {
+            const saved = localStorage.getItem('fifa_tournament_v2');
+            if (saved) {
+                tournament = JSON.parse(saved);
+                renderAll();
+            }
+        }
+
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+            document.getElementById('nav-' + viewName).classList.add('active');
+        }
+
+        // --- SETUP LOGIC ---
+        function addPlayer() {
+            const input = document.getElementById('player-name');
+            const name = input.value.trim();
+            if (name && !tournament.players.includes(name)) {
+                tournament.players.push(name);
+                input.value = '';
+                save();
+                renderAll();
+            }
+        }
+
+        function addTeam() {
+            const owner = document.getElementById('team-owner').value;
+            const name = document.getElementById('team-name').value.trim();
+            if (owner && name) {
+                tournament.teams.push({
+                    id: crypto.randomUUID(),
+                    name: name,
+                    owner: owner
+                });
+                document.getElementById('team-name').value = '';
+                save();
+                renderAll();
+            }
+        }
+
+        function generateSchedule() {
+            if (tournament.teams.length < 2) {
+                alert("You need at least 2 teams!");
+                return;
+            }
+
+            const teams = tournament.teams;
+            let matches = [];
+
+            // Double Round Robin Combinations
+            for (let i = 0; i < teams.length; i++) {
+                for (let j = 0; j < teams.length; j++) {
+                    if (i !== j && teams[i].owner !== teams[j].owner) {
+                        matches.push({
+                            id: crypto.randomUUID(),
+                            home: teams[i],
+                            away: teams[j],
+                            hScore: null,
+                            aScore: null,
+                            completed: false,
+                            scorers: []
+                        });
+                    }
+                }
+            }
+
+            // Shuffle
+            matches = matches.sort(() => Math.random() - 0.5);
+
+            // Reorder to minimize wait
+            const reordered = [];
+            if (matches.length > 0) {
+                reordered.push(matches.pop());
+                while (matches.length > 0) {
+                    const last = reordered[reordered.length - 1];
+                    const lastOwners = [last.home.owner, last.away.owner];
+
+                    let bestIdx = 0;
+                    let minPenalty = 100;
+
+                    for (let k = 0; k < Math.min(matches.length, 10); k++) {
+                        let penalty = 0;
+                        if (lastOwners.includes(matches[k].home.owner)) penalty++;
+                        if (lastOwners.includes(matches[k].away.owner)) penalty++;
+
+                        if (penalty === 0) {
+                            bestIdx = k;
+                            break;
+                        }
+                        if (penalty < minPenalty) {
+                            minPenalty = penalty;
+                            bestIdx = k;
+                        }
+                    }
+                    reordered.push(matches.splice(bestIdx, 1)[0]);
+                }
+            }
+
+            tournament.matches = reordered;
+            save();
+            switchView('matches');
+            renderAll();
+        }
+
+        // --- MATCH LOGIC ---
+        function submitScore(matchId) {
+            const h = parseInt(document.getElementById('score-h').value) || 0;
+            const a = parseInt(document.getElementById('score-a').value) || 0;
+            const scrs = document.getElementById('scorers-input').value.split(',').map(s => s.trim()).filter(s => s);
+
+            const match = tournament.matches.find(m => m.id === matchId);
+            if (match) {
+                match.hScore = h;
+                match.aScore = a;
+                match.scorers = scrs;
+                match.completed = true;
+
+                // Track scorers
+                scrs.forEach(s => {
+                    tournament.scorers[s] = (tournament.scorers[s] || 0) + 1;
+                });
+
+                save();
+                renderAll();
+            }
+        }
+
+        // --- UI RENDERING ---
+        function renderAll() {
+            // Setup
+            document.getElementById('player-list').innerHTML = tournament.players.map(p =>
+                `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-bold">${p}</span>`
+            ).join('');
+
+            document.getElementById('team-owner').innerHTML = tournament.players.map(p =>
+                `<option value="${p}">${p}</option>`
+            ).join('');
+
+            document.getElementById('team-list').innerHTML = tournament.teams.map(t =>
+                `<div class="flex justify-between items-center bg-slate-900 px-4 py-2 rounded-xl text-sm border border-slate-800">
+                    <span class="font-bold">${t.name}</span>
+                    <span class="text-gray-500 text-[10px] uppercase font-black">${t.owner}</span>
+                </div>`
+            ).join('');
+
+            // Matches
+            const pending = tournament.matches.filter(m => !m.completed);
+            const history = tournament.matches.filter(m => m.completed).reverse();
+
+            if (pending.length > 0) {
+                const next = pending[0];
+                document.getElementById('next-match-container').innerHTML = `
+                    <div class="glass p-12 rounded-[2.5rem] border-blue-500/30">
+                        <div class="text-center text-xs font-black tracking-widest text-blue-500 uppercase mb-8">Next Match</div>
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                            <div class="text-center flex-1">
+                                <div class="text-4xl font-extrabold mb-2">${next.home.name}</div>
+                                <div class="text-gray-500 text-sm font-bold">${next.home.owner}</div>
+                                <input id="score-h" type="number" min="0" placeholder="0" class="mt-8 bg-slate-900 border-2 border-slate-700 w-24 h-24 text-center text-5xl font-black rounded-3xl focus:border-blue-500 outline-none">
+                            </div>
+                            <div class="text-4xl text-slate-700 font-bold">VS</div>
+                            <div class="text-center flex-1">
+                                <div class="text-4xl font-extrabold mb-2">${next.away.name}</div>
+                                <div class="text-gray-500 text-sm font-bold">${next.away.owner}</div>
+                                <input id="score-a" type="number" min="0" placeholder="0" class="mt-8 bg-slate-900 border-2 border-slate-700 w-24 h-24 text-center text-5xl font-black rounded-3xl focus:border-blue-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-12 max-w-md mx-auto space-y-4 text-center">
+                            <input id="scorers-input" type="text" placeholder="Goal Scorers (comma separated)" class="w-full bg-slate-900 p-4 border border-slate-700 rounded-2xl outline-none focus:border-blue-500">
+                            <button onclick="submitScore('${next.id}')" class="btn-active w-full py-5 rounded-3xl font-black text-xl tracking-tighter uppercase">Submit Result</button>
+                        </div>
+                    </div>
+                `;
+            } else if (tournament.matches.length > 0) {
+                document.getElementById('next-match-container').innerHTML = `
+                    <div class="glass p-16 rounded-[2.5rem] text-center">
+                        <div class="text-6xl mb-6">🏆</div>
+                        <h2 class="text-4xl font-black">LEGENDARY!</h2>
+                        <p class="text-gray-500 mt-2 font-bold uppercase tracking-widest text-sm">League Completed</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('upcoming-list').innerHTML = pending.slice(1, 11).map(m => `
+                <div class="bg-slate-900/40 p-4 rounded-2xl flex justify-between items-center text-xs border border-slate-800/50">
+                    <div class="flex-1 text-right font-bold text-gray-300">${m.home.name}</div>
+                    <div class="px-4 text-slate-700 font-black italic">VS</div>
+                    <div class="flex-1 font-bold text-gray-300">${m.away.name}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('history-list').innerHTML = history.slice(0, 10).map(m => `
+                <div class="glass p-4 rounded-2xl flex justify-between items-center text-xs">
+                    <div class="flex-1 text-right font-bold">${m.home.name}</div>
+                    <div class="px-6 text-blue-400 font-black text-lg tracking-tighter">${m.hScore} - ${m.aScore}</div>
+                    <div class="flex-1 font-bold">${m.away.name}</div>
+                </div>
+            `).join('');
+
+            // Standings
+            calculateStandings();
+        }
+
+        function calculateStandings() {
+            const table = {};
+            tournament.teams.forEach(t => {
+                table[t.id] = { name: t.name, owner: t.owner, gp: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
+            });
+
+            tournament.matches.filter(m => m.completed).forEach(m => {
+                const h = table[m.home.id];
+                const a = table[m.away.id];
+                h.gp++; a.gp++;
+                h.gf += m.hScore; h.ga += m.aScore;
+                a.gf += m.aScore; a.ga += m.hScore;
+
+                if (m.hScore > m.aScore) { h.w++; h.pts += 3; a.l++; }
+                else if (m.aScore > m.hScore) { a.w++; a.pts += 3; h.l++; }
+                else { h.d++; a.d++; h.pts += 1; a.pts += 1; }
+            });
+
+            const sorted = Object.values(table).sort((a, b) => (b.pts - a.pts) || ((b.gf - b.ga) - (a.gf - a.ga)) || (b.gf - a.gf));
+
+            document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
+                <tr class="hover:bg-blue-500/5 transition group">
+                    <td class="px-8 py-6 font-black text-gray-600">${i + 1}</td>
+                    <td class="px-8 py-6 font-extrabold text-blue-50">${t.name}</td>
+                    <td class="px-8 py-6 text-xs text-gray-500 font-bold uppercase">${t.owner}</td>
+                    <td class="px-8 py-6 text-center text-sm">${t.gp}</td>
+                    <td class="px-8 py-6 text-center text-sm font-bold text-green-400/80">${t.w}</td>
+                    <td class="px-8 py-6 text-center text-sm font-bold text-gray-500">${t.d}</td>
+                    <td class="px-8 py-6 text-center text-sm font-bold text-red-400/80">${t.l}</td>
+                    <td class="px-8 py-6 text-center text-xl font-black bg-blue-500/5 text-blue-400 border-l border-slate-800">${t.pts}</td>
+                </tr>
+            `).join('');
+
+            const comp = tournament.matches.filter(m => m.completed).length;
+            const prog = tournament.matches.length > 0 ? (comp / tournament.matches.length * 100) : 0;
+            document.getElementById('progress-bar').style.width = prog + '%';
+            document.getElementById('progress-text').innerText = 'Progress: ' + Math.floor(prog) + '%';
+
+            // Top Scorers
+            const scorers = Object.entries(tournament.scorers).sort((a, b) => b[1] - a[1]);
+            document.getElementById('scorers-list').innerHTML = scorers.map(([name, goals]) => `
+                <div class="flex justify-between items-center bg-slate-900/80 p-3 rounded-2xl text-sm border border-slate-800">
+                    <span class="font-bold">${name}</span>
+                    <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">${goals} Goals</span>
+                </div>
+            `).join('');
+        }
+
+        // --- RESET & EXPORT ---
+        function resetTournament() {
+            if (confirm("THIS DELETES ALL DATA. ARE YOU SURE?")) {
+                tournament = { players: [], teams: [], matches: [], scorers: {} };
+                save();
+                window.location.reload();
+            }
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tournament));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "fifa_tournament_data.json");
+            dlAnchorElem.click();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    tournament = JSON.parse(e.target.result);
+                    save();
+                    renderAll();
+                    alert("Data Restored!");
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Init
+        load();
+        switchView('setup');
+
+    </script>
+</body>
+
+</html>
