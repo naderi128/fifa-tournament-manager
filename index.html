@@ -84,17 +84,57 @@
                     <h2 class="text-xl font-bold mb-6 text-indigo-400 flex items-center gap-2">
                         <span>🏟️</span> Step 2: Assign Teams
                     </h2>
-                    <div class="space-y-4">
-                        <select id="team-owner"
-                            class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-indigo-500 transition"></select>
-                        <div class="flex gap-2">
-                            <input type="text" id="team-name" placeholder="e.g. Real Madrid"
-                                class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 w-full outline-none focus:border-indigo-500 transition">
-                            <button onclick="addTeam()"
-                                class="bg-indigo-600 hover:bg-indigo-500 px-6 py-3 rounded-xl font-bold transition">Assign</button>
+
+                    <div class="space-y-6">
+                        <!-- Player Selector Cards -->
+                        <div id="player-selector-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <!-- Dynamic player selection cards will go here -->
+                        </div>
+
+                        <div id="team-input-area" class="hidden">
+                            <div class="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-2xl mb-4">
+                                <p class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Adding for:
+                                </p>
+                                <p id="active-player-name" class="text-xl font-black text-white"></p>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <input type="text" id="team-name" placeholder="Type team name (e.g. Liverpool)"
+                                    list="team-suggestions"
+                                    class="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-4 w-full outline-none focus:border-indigo-500 transition text-lg">
+                                <button onclick="addTeam()"
+                                    class="bg-indigo-600 hover:bg-indigo-500 px-8 py-4 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                                    <span>Add</span>
+                                </button>
+                            </div>
+
+                            <!-- Autofill Suggestions -->
+                            <datalist id="team-suggestions">
+                                <option value="Real Madrid"></option>
+                                <option value="Manchester City"></option>
+                                <option value="Liverpool"></option>
+                                <option value="Paris Saint-Germain"></option>
+                                <option value="Bayern Munich"></option>
+                                <option value="Barcelona"></option>
+                                <option value="Arsenal"></option>
+                                <option value="Manchester United"></option>
+                                <option value="Chelsea"></option>
+                                <option value="Inter Milan"></option>
+                                <option value="AC Milan"></option>
+                                <option value="Juventus"></option>
+                                <option value="Atletico Madrid"></option>
+                                <option value="Borussia Dortmund"></option>
+                                <option value="Napoli"></option>
+                                <option value="Tottenham Hotspur"></option>
+                                <option value="Bayer Leverkusen"></option>
+                                <option value="Al Nassr"></option>
+                                <option value="Al Hilal"></option>
+                                <option value="Inter Miami"></option>
+                            </datalist>
                         </div>
                     </div>
-                    <div id="team-list" class="mt-8 space-y-2"></div>
+
+                    <div id="team-list" class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                 </div>
             </div>
 
@@ -188,7 +228,8 @@
             players: [],
             teams: [],
             matches: [],
-            scorers: {}
+            scorers: {},
+            activePlayer: null
         };
 
         // --- CORE FUNCTIONS ---
@@ -224,19 +265,37 @@
             }
         }
 
+        function selectPlayerForTeam(playerName) {
+            tournament.activePlayer = playerName;
+            document.getElementById('team-input-area').classList.remove('hidden');
+            document.getElementById('active-player-name').innerText = playerName;
+            document.getElementById('team-name').focus();
+            renderAll();
+        }
+
         function addTeam() {
-            const owner = document.getElementById('team-owner').value;
-            const name = document.getElementById('team-name').value.trim();
+            const owner = tournament.activePlayer;
+            const nameInput = document.getElementById('team-name');
+            const name = nameInput.value.trim();
             if (owner && name) {
                 tournament.teams.push({
                     id: crypto.randomUUID(),
                     name: name,
                     owner: owner
                 });
-                document.getElementById('team-name').value = '';
+                nameInput.value = '';
                 save();
                 renderAll();
+
+                // Keep focus if they want to add more for same player
+                nameInput.focus();
             }
+        }
+
+        function deleteTeam(id) {
+            tournament.teams = tournament.teams.filter(t => t.id !== id);
+            save();
+            renderAll();
         }
 
         function generateSchedule() {
@@ -305,9 +364,15 @@
 
         // --- MATCH LOGIC ---
         function submitScore(matchId) {
-            const h = parseInt(document.getElementById('score-h').value) || 0;
-            const a = parseInt(document.getElementById('score-a').value) || 0;
-            const scrs = document.getElementById('scorers-input').value.split(',').map(s => s.trim()).filter(s => s);
+            const h = parseInt(document.getElementById('score-h').value);
+            const a = parseInt(document.getElementById('score-a').value);
+            const scrsInput = document.getElementById('scorers-input');
+            const scrs = scrsInput.value.split(',').map(s => s.trim()).filter(s => s);
+
+            if (isNaN(h) || isNaN(a)) {
+                alert("Please enter both scores!");
+                return;
+            }
 
             const match = tournament.matches.find(m => m.id === matchId);
             if (match) {
@@ -328,21 +393,33 @@
 
         // --- UI RENDERING ---
         function renderAll() {
-            // Setup
+            // Step 1 List
             document.getElementById('player-list').innerHTML = tournament.players.map(p =>
                 `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-bold">${p}</span>`
             ).join('');
 
-            document.getElementById('team-owner').innerHTML = tournament.players.map(p =>
-                `<option value="${p}">${p}</option>`
-            ).join('');
+            // Step 2 Player Selectors
+            document.getElementById('player-selector-container').innerHTML = tournament.players.map(p => `
+                <button onclick="selectPlayerForTeam('${p}')" 
+                        class="p-4 rounded-2xl border-2 transition-all duration-200 text-left ${tournament.activePlayer === p ? 'border-indigo-500 bg-indigo-500/20' : 'border-slate-800 bg-slate-900/50 hover:border-slate-700'}">
+                    <p class="text-[10px] text-gray-500 font-black uppercase mb-1">Player</p>
+                    <p class="font-bold truncate">${p}</p>
+                    <p class="text-[10px] text-indigo-400 mt-2 font-bold">${tournament.teams.filter(t => t.owner === p).length} Teams</p>
+                </button>
+            `).join('');
 
-            document.getElementById('team-list').innerHTML = tournament.teams.map(t =>
-                `<div class="flex justify-between items-center bg-slate-900 px-4 py-2 rounded-xl text-sm border border-slate-800">
-                    <span class="font-bold">${t.name}</span>
-                    <span class="text-gray-500 text-[10px] uppercase font-black">${t.owner}</span>
-                </div>`
-            ).join('');
+            // Step 2 Team List
+            document.getElementById('team-list').innerHTML = tournament.teams.map(t => `
+                <div class="group relative glass p-4 rounded-2xl flex justify-between items-center text-sm">
+                    <div>
+                        <p class="font-black text-white">${t.name}</p>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">${t.owner}</p>
+                    </div>
+                    <button onclick="deleteTeam('${t.id}')" class="text-red-500/0 group-hover:text-red-500/60 hover:!text-red-500 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+            `).join('');
 
             // Matches
             const pending = tournament.matches.filter(m => !m.completed);
@@ -356,13 +433,13 @@
                         <div class="flex flex-col md:flex-row items-center justify-between gap-12">
                             <div class="text-center flex-1">
                                 <div class="text-4xl font-extrabold mb-2">${next.home.name}</div>
-                                <div class="text-gray-500 text-sm font-bold">${next.home.owner}</div>
+                                <div class="text-gray-500 text-sm font-bold uppercase tracking-widest">${next.home.owner}</div>
                                 <input id="score-h" type="number" min="0" placeholder="0" class="mt-8 bg-slate-900 border-2 border-slate-700 w-24 h-24 text-center text-5xl font-black rounded-3xl focus:border-blue-500 outline-none">
                             </div>
                             <div class="text-4xl text-slate-700 font-bold">VS</div>
                             <div class="text-center flex-1">
                                 <div class="text-4xl font-extrabold mb-2">${next.away.name}</div>
-                                <div class="text-gray-500 text-sm font-bold">${next.away.owner}</div>
+                                <div class="text-gray-500 text-sm font-bold uppercase tracking-widest">${next.away.owner}</div>
                                 <input id="score-a" type="number" min="0" placeholder="0" class="mt-8 bg-slate-900 border-2 border-slate-700 w-24 h-24 text-center text-5xl font-black rounded-3xl focus:border-blue-500 outline-none">
                             </div>
                         </div>
@@ -376,29 +453,28 @@
                 document.getElementById('next-match-container').innerHTML = `
                     <div class="glass p-16 rounded-[2.5rem] text-center">
                         <div class="text-6xl mb-6">🏆</div>
-                        <h2 class="text-4xl font-black">LEGENDARY!</h2>
-                        <p class="text-gray-500 mt-2 font-bold uppercase tracking-widest text-sm">League Completed</p>
+                        <h2 class="text-4xl font-black tracking-tighter">FINALE COMPLETO!</h2>
+                        <p class="text-gray-500 mt-2 font-bold uppercase tracking-widest text-xs">League History Recorded</p>
                     </div>
                 `;
             }
 
             document.getElementById('upcoming-list').innerHTML = pending.slice(1, 11).map(m => `
-                <div class="bg-slate-900/40 p-4 rounded-2xl flex justify-between items-center text-xs border border-slate-800/50">
-                    <div class="flex-1 text-right font-bold text-gray-300">${m.home.name}</div>
-                    <div class="px-4 text-slate-700 font-black italic">VS</div>
-                    <div class="flex-1 font-bold text-gray-300">${m.away.name}</div>
+                <div class="bg-slate-900/40 p-4 rounded-2xl flex justify-between items-center text-[10px] border border-slate-800/50">
+                    <div class="flex-1 text-right font-black uppercase text-gray-300 truncate">${m.home.name}</div>
+                    <div class="px-4 text-slate-800 font-black italic">VS</div>
+                    <div class="flex-1 font-black uppercase text-gray-300 truncate">${m.away.name}</div>
                 </div>
             `).join('');
 
             document.getElementById('history-list').innerHTML = history.slice(0, 10).map(m => `
                 <div class="glass p-4 rounded-2xl flex justify-between items-center text-xs">
-                    <div class="flex-1 text-right font-bold">${m.home.name}</div>
+                    <div class="flex-1 text-right font-bold truncate">${m.home.name}</div>
                     <div class="px-6 text-blue-400 font-black text-lg tracking-tighter">${m.hScore} - ${m.aScore}</div>
-                    <div class="flex-1 font-bold">${m.away.name}</div>
+                    <div class="flex-1 font-bold truncate">${m.away.name}</div>
                 </div>
             `).join('');
 
-            // Standings
             calculateStandings();
         }
 
