@@ -5,9 +5,9 @@ import json
 import datetime
 import io
 
-import persistence
-from models import Tournament
-from scheduler import generate_double_round_robin_schedule
+from . import persistence
+from .models import Tournament
+from .scheduler import generate_double_round_robin_schedule
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = 'fifa_league_secret_key'
